@@ -1,30 +1,36 @@
-/**
- * @author UCSD MOOC development team and YOU
- * 
- * A class which reprsents a graph of geographic locations
- * Nodes in the graph are intersections between 
- *
- */
 package roadgraph;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.function.Consumer;
 
 import geography.GeographicPoint;
+import geography.RoadSegment;
 import util.GraphLoader;
 
 /**
  * @author UCSD MOOC development team and YOU
  * 
  * A class which represents a graph of geographic locations
- * Nodes in the graph are intersections between 
+ * Nodes in the graph are intersections  
  *
  */
 public class MapGraph {
 	//TODO: Add your member variables here in WEEK 2
-	
+	// Adjacency List Map that maps intersections to neighbors
+	private HashMap<GeographicPoint, List<GeographicPoint>> intersections;
+
+	// Graph variables
+	private int numVertices;
+	private int numEdges;
 	
 	/** 
 	 * Create a new empty MapGraph 
@@ -32,6 +38,9 @@ public class MapGraph {
 	public MapGraph()
 	{
 		// TODO: Implement in this constructor in WEEK 2
+		intersections = new HashMap<GeographicPoint, List<GeographicPoint>>();
+		numVertices = 0;
+		numEdges = 0;
 	}
 	
 	/**
@@ -41,7 +50,7 @@ public class MapGraph {
 	public int getNumVertices()
 	{
 		//TODO: Implement this method in WEEK 2
-		return 0;
+		return this.numVertices;
 	}
 	
 	/**
@@ -51,7 +60,7 @@ public class MapGraph {
 	public Set<GeographicPoint> getVertices()
 	{
 		//TODO: Implement this method in WEEK 2
-		return null;
+		return intersections.keySet();
 	}
 	
 	/**
@@ -61,10 +70,12 @@ public class MapGraph {
 	public int getNumEdges()
 	{
 		//TODO: Implement this method in WEEK 2
-		return 0;
+		return this.numEdges;
 	}
 
-	
+	public boolean contains(GeographicPoint intersection) {
+		return intersections.containsKey(intersection);
+	}
 	
 	/** Add a node corresponding to an intersection at a Geographic Point
 	 * If the location is already in the graph or null, this method does 
@@ -76,8 +87,14 @@ public class MapGraph {
 	public boolean addVertex(GeographicPoint location)
 	{
 		// TODO: Implement this method in WEEK 2
-		return false;
+		if (location == null || intersections.containsKey(location)) { return false; }
+		
+		intersections.put(location, new ArrayList<GeographicPoint>());
+		numVertices++;
+		
+		return true;
 	}
+	
 	
 	/**
 	 * Adds a directed edge to the graph from pt1 to pt2.  
@@ -95,10 +112,21 @@ public class MapGraph {
 			String roadType, double length) throws IllegalArgumentException {
 
 		//TODO: Implement this method in WEEK 2
-		
+		intersections.get(from).add(to);
+		numEdges++;
 	}
 	
-
+	public boolean removeEdge(GeographicPoint from, GeographicPoint to) {
+		
+		// Check: nodes "from" and "to" exist
+		if (!(this.contains(from) && this.contains(to))) { return false; }
+		
+        intersections.get(from).remove(to);
+        numEdges--;
+        
+        return true;
+	}
+	
 	/** Find the path from start to goal using breadth first search
 	 * 
 	 * @param start The starting location
@@ -124,14 +152,78 @@ public class MapGraph {
 			 					     GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
 		// TODO: Implement this method in WEEK 2
+		if (!intersections.containsKey(start) || !intersections.containsKey(goal)) { return null; }
+		
+		Queue<GeographicPoint> queue = new LinkedList<GeographicPoint>();	// Intersections to explore
+		HashSet<GeographicPoint> visited = new HashSet<GeographicPoint>();	// Visited intersections
+		HashMap<GeographicPoint, GeographicPoint> parentMap =
+				new HashMap<GeographicPoint, GeographicPoint>();			// Parent map
+
+		// Loop through queue and construct the parentMap
+		bfsLoop(start, goal, queue, visited, parentMap);
 		
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
 
-		return null;
+		// Construct the shortest path from start to goal using the constructed parentMap
+		List<GeographicPoint> path = findShortestPath(start, goal, parentMap);
+		
+		// Check: No path if list contains only one element (we didn't move)
+		if (path.size() == 1) { return null; }
+		
+		return path;
+	}
+
+	/*Helper method for bfs*/
+	private void bfsLoop(GeographicPoint start, GeographicPoint goal, Queue<GeographicPoint> queue, 
+			HashSet<GeographicPoint> visited, HashMap<GeographicPoint, GeographicPoint> parentMap) {
+		
+		// Add start to queue and visited
+		queue.add(start);
+		visited.add(start);
+		
+		// Loop through queue until queue is empty or we reach "goal"
+		while (!queue.isEmpty()) {
+			
+			GeographicPoint curr = queue.remove();
+			
+			if (curr.equals(goal)) { break; }
+			
+			// Check: neighbor intersections of curr. See if any are "goal"
+			for (GeographicPoint next : intersections.get(curr)) {
+				
+				if (!visited.contains(next)) {
+					
+					queue.add(next);
+					visited.add(next);
+					parentMap.put(next, curr);
+					
+				}
+				
+			}
+			
+		}
 	}
 	
-
+	private List<GeographicPoint> findShortestPath(GeographicPoint start, GeographicPoint goal,
+			HashMap<GeographicPoint, GeographicPoint> parentMap) {
+		
+		// Reconstruct Shortest Path
+		LinkedList<GeographicPoint> path = new LinkedList<GeographicPoint>();
+		GeographicPoint curr = goal;
+		
+		while (curr != null) {
+			path.add(curr);
+			curr = parentMap.get(curr);
+		}
+		
+		// Reverse constructed path
+		Collections.reverse(path);
+		
+		return path;
+	}
+	
+	
 	/** Find the path from start to goal using Dijkstra's algorithm
 	 * 
 	 * @param start The starting location

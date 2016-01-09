@@ -24,6 +24,7 @@ public class RoadSegment {
 	// Length in km
 	private double length;
 	
+	// Creates road between two GeographicPoint nodes
 	public RoadSegment(GeographicPoint pt1, GeographicPoint pt2, 
 						List<GeographicPoint> geometry, String roadName,
 						String roadType, double length)
@@ -66,8 +67,9 @@ public class RoadSegment {
 		return allPoints;
 	}
 	
-	/** Two road segments are equal if they have the same start and end points
-	 *  and they have the same road name.
+	/** Two road segments are equal if:
+	 * 	1) Same start & end points
+	 * 	2) Same road name
 	 */
 	public boolean equals(Object o)
 	{

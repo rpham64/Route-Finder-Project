@@ -1,6 +1,8 @@
 package geography;
 
 import java.awt.geom.Point2D.Double;
+import java.util.LinkedList;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public class GeographicPoint extends Double {
@@ -39,6 +41,7 @@ public class GeographicPoint extends Double {
     	double d = R * c;
     	return d;
     }
+    
     
     public String toString()
     {
