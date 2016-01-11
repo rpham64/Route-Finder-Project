@@ -111,6 +111,9 @@ public class RoadSegment {
 	// get the length of the road segment
 	public double getLength() { return this.length; }
 	
+	public GeographicPoint getStart() { return this.point1; }
+	
+	public GeographicPoint getEnd() { return this.point2; }
 	
 	// given one end, return the other.
 	public geography.GeographicPoint getOtherPoint(geography.GeographicPoint point) {
