@@ -388,7 +388,7 @@ public class MapGraph {
 			return null;
 		}
 		if (goalNode == null) { 
-			System.out.println("Starting node: " + goalNode + " does not exist.");
+			System.out.println("Goal node: " + goalNode + " does not exist.");
 			return null;
 		}
 		
@@ -403,25 +403,29 @@ public class MapGraph {
 		startNode.setDistance(0);
 		
 		// Initiate search loop and fill parentMap
-		heuristicSearchLoop(startNode, goalNode, queue, visited, parentMap, nodeSearched, searchType);
+		double distance = heuristicSearchLoop(startNode, goalNode, queue, visited, parentMap, nodeSearched, searchType);
 		
 		// Construct shortest path from startNode to goalNode
 		List<GeographicPoint> path = findPath(startNode, goalNode, parentMap);
 		
+		System.out.println("\nPath Distance: " + distance + " kms.\n");
 		return path;
 	}
 	
 	/*Helper method for searching MapGraph and constructing parentMap*/
-	private void heuristicSearchLoop(MapNode startNode, MapNode goalNode, PriorityQueue<MapNode> queue, 
+	private double heuristicSearchLoop(MapNode startNode, MapNode goalNode, PriorityQueue<MapNode> queue, 
 			HashSet<MapNode> visited, HashMap<MapNode, MapNode> parentMap, 
 			Consumer<GeographicPoint> nodeSearched, String searchType) {
 		
 		queue.add(startNode);	// Add startNode to queue
+//		int count = 0;			// Uncomment to see # Nodes checked
+		double totalDistance = 0;	// Total path distance
 		
 		while (!queue.isEmpty()) {
 			
 			// Remove head of priority queue and assign to "curr"
 			MapNode curr = queue.remove();
+//			count++;		// Uncomment to see # Nodes checked
 			
 			// Hook for visualization.  See writeup.
 			nodeSearched.accept(curr.getLocation());
@@ -432,7 +436,11 @@ public class MapGraph {
 				visited.add(curr);
 				
 				// If we reached goalNode, then break loop
-				if (curr.equals(goalNode)) { break; }
+				if (curr.equals(goalNode)) { 
+//					System.out.println("Total path distance: " + curr.getDistance());	// Prints total path distance
+					totalDistance += curr.getDistance();
+					break;
+				}
 				
 				for (MapEdge edge : curr.getEdges()) {
 					
@@ -447,6 +455,7 @@ public class MapGraph {
 					
 					// Check: searchType is AStar
 					if (searchType.equals("AStar")) {
+						
 						GeographicPoint currentLocation = curr.getLocation();
 						GeographicPoint goalLocation = goalNode.getLocation();
 						Double currToGoal = currentLocation.distance(goalLocation);
@@ -467,6 +476,10 @@ public class MapGraph {
 			}
 			
 		}
+		
+		// Uncomment to see number of nodes checked
+//		System.out.println(count);
+		return totalDistance;	// Total Path Distance
 	}
 	
 	
@@ -497,6 +510,64 @@ public class MapGraph {
 		return path;
 	}
 	
+	// PROJECT EXTENSION
+	// Traveling Salesman Problem Pseudocode
+	// Initial: List of vertices
+	// Idea: Set initial vertex as start. Then, use A* search to check which distance is shortest between
+	// start's neighbors. Once found, set that vertex to goal and store the list result.
+	// Then, set the goal node to start node, remove it from the list of vertices, and repeat.
+	// Once the list is empty, set goal node to the initial vertex.
+	// Return: List/Array of vertices with shortest path between all vertices, starting 
+	// and ending at the initial vertex (A->B->C->D->A)
+	
+	public List<List<GeographicPoint>> createTravelPlan(List<GeographicPoint> locations) {
+		
+		for (GeographicPoint location : locations) {
+			
+			// Check: If any location does not exist
+			if (location == null) {
+				throw new NullPointerException("One or more locations are NULL. Please verify "
+						+ "these locations exist.");
+			}
+			
+		}
+		
+		// List containing paths of all pairs of locations in given list
+		List<List<GeographicPoint>> path = new LinkedList<List<GeographicPoint>>();
+		
+		// Implement A* on each pair of nodes. For last node, set goal node to be the home node.
+		for (int i = 1; i < locations.size(); i++) {
+			
+			GeographicPoint start = locations.get(i-1);
+			GeographicPoint goal = locations.get(i);
+			
+			System.out.println("Start: " + start);
+			System.out.println("Goal: " + goal);
+			
+			// A* on start & goal
+			// Return: Path from start to goal
+			List<GeographicPoint> startToGoal = aStarSearch(start, goal);
+			
+			path.add(startToGoal);
+			
+		}
+		
+		// Add path from last node back to home
+		GeographicPoint last = locations.get(locations.size()-1);
+		GeographicPoint home = locations.get(0);
+		
+		System.out.println("Start: " + last);
+		System.out.println("Goal: " + home);
+		
+		List<GeographicPoint> lastToHome = aStarSearch(last, home);
+		path.add(lastToHome);
+		
+		System.out.println("\nPath: " + path);
+		return path;
+		
+	}
+	
+	
 	public static void main(String[] args)
 	{
 		/*System.out.print("Making a new map...");
@@ -512,16 +583,36 @@ public class MapGraph {
 		MapGraph theMap = new MapGraph();
 		System.out.print("DONE. \nLoading the map...");
 		GraphLoader.loadRoadMap("data/maps/utc.map", theMap);
-		System.out.println("DONE.");
+		System.out.println("DONE.\n");
 
-		GeographicPoint start = new GeographicPoint(32.8648772, -117.2254046);
-		GeographicPoint end = new GeographicPoint(32.8660691, -117.217393);
+//		GeographicPoint start = new GeographicPoint(32.8648772, -117.2254046);
+//		GeographicPoint end = new GeographicPoint(32.8660691, -117.217393);
 		
+//		List<GeographicPoint> route = theMap.dijkstra(start,end);
+//		List<GeographicPoint> route2 = theMap.aStarSearch(start,end);
+	
+//		System.out.println(route);
+//		System.out.println(route2);
 		
-		List<GeographicPoint> route = theMap.dijkstra(start,end);
-		List<GeographicPoint> route2 = theMap.aStarSearch(start,end);
-
+		// Project Extension Test
+		System.out.println("Project Extension Test!");
+		System.out.println("Start trip.\n");
 		
+		List<GeographicPoint> test = new LinkedList<GeographicPoint>();
+		
+		GeographicPoint pt1 = new GeographicPoint(32.8648772, -117.2254046);
+		GeographicPoint pt2 = new GeographicPoint(32.86348, -117.221451);
+		GeographicPoint pt3 = new GeographicPoint(32.8629988, -117.2120758);
+		GeographicPoint pt4 = new GeographicPoint(32.862453, -117.216522);
+		GeographicPoint pt5 = new GeographicPoint(32.8660691, -117.217393);
+		
+		test.add(pt1);
+		test.add(pt2);
+		test.add(pt3);
+		test.add(pt4);
+		test.add(pt5);
+		
+		theMap.createTravelPlan(test);
 		
 	}
 	

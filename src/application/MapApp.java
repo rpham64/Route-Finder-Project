@@ -52,8 +52,8 @@ import gmapsfx.javascript.object.MapTypeIdEnum;
 public class MapApp extends Application
 					implements MapComponentInitializedListener {
 
-	protected GoogleMapView mapComponent;
-	protected GoogleMap map;
+  protected GoogleMapView mapComponent;
+  protected GoogleMap map;
   protected BorderPane bp;
   protected Stage primaryStage;
 
@@ -107,6 +107,7 @@ public class MapApp extends Application
     Image dImage = new Image(MarkerManager.destinationURL);
     CLabel<geography.GeographicPoint> startLabel = new CLabel<geography.GeographicPoint>("Empty.", new ImageView(sImage), null);
     CLabel<geography.GeographicPoint> endLabel = new CLabel<geography.GeographicPoint>("Empty.", new ImageView(dImage), null);
+  
     //TODO -- hot fix
     startLabel.setMinWidth(180);
     endLabel.setMinWidth(180);
@@ -266,7 +267,6 @@ public class MapApp extends Application
       destinationBox.getChildren().add(destButton);
       destinationBox.setSpacing(20);
 
-
       VBox markerBox = new VBox();
       Label markerLabel = new Label("Selected Marker : ");
 
@@ -298,7 +298,7 @@ public class MapApp extends Application
       VBox.setMargin(vButton, new Insets(MARGIN_VAL,MARGIN_VAL,MARGIN_VAL,MARGIN_VAL));
       vButton.setDisable(true);
       v.getChildren().add(markerBox);
-      //v.getChildren().add(resetButton);
+      v.getChildren().add(resetButton);
 
 
       routeTab.setContent(h);
@@ -337,6 +337,7 @@ public class MapApp extends Application
 	  RadioButton rbB = new RadioButton("BFS");
 	  rbB.setUserData("BFS");
 
+	  
 	  rbB.setToggleGroup(group);
 	  rbD.setToggleGroup(group);
 	  rbA.setToggleGroup(group);

@@ -129,13 +129,6 @@ class MapNode implements Comparable<MapNode>
 	public void setActualDistance(double actualDistance) {
 	    this.actualDistance = actualDistance;
 	}
-	
-//	// Code to implement Comparable
-//	public int compareTo(Object o) {
-//		// convert to map node, may throw exception
-//		MapNode m = (MapNode)o; 
-//		return ((Double)this.getDistance()).compareTo((Double) m.getDistance());
-//	}
 		
     // Code to implement Comparable
 	@Override
