@@ -29,7 +29,7 @@ for their class' project.
 
 5. Click **Finish**.
 
-### Technical Concepts
+# Technical Concepts
 
   * Adjacency Lists vs Adjacency Matrices
   * Graph Theory
