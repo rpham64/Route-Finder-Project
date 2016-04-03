@@ -1,6 +1,9 @@
 # Route-Finder-Project
 
 **Route Finder Project** is a mapping application created in Java for providing and visualizing map routes, similar to Google Maps. 
+Users can use the application to find the best driving route between two locations, whether it's by the least number of intersections
+(via BFS) or the shortest distance (via Dijkstra's or A* search).
+
 This project was created as part of UCSD's Coursera class "Advanced Data Structures in Java", course 3 of their "Java Programming:
 Object Oriented Design of Data Structures Specialization" cirriculum. The code and files in this repository include my implementations
 for their class' project.
